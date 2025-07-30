@@ -66,7 +66,7 @@ NSP_USERNAME=your_username
 NSP_PASSWORD=your_password
 
 # Kafka Configuration
-KAFKA_BOOTSTRAP_SERVERS=YOUR_KAFKA_SERVER:9093
+KAFKA_BOOTSTRAP_SERVERS=YOUR_KAFKA_SERVER:9192
 
 # SSL Configuration (provide paths to your certs)
 KAFKA_SSL_CA_LOCATION=./certs/ca-cert.pem
