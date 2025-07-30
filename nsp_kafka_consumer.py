@@ -206,12 +206,12 @@ class NSPKafkaConsumer:
         self.kafka_client = NSPKafkaClient(kafka_config, topics)
         self.kafka_client.connect()
     
-    def _discover_topics(self, kafka_config: Dict, use_tui: bool = False) -> List[str]:
+    def _discover_topics(self, kafka_config: Dict) -> List[str]:
         """Discover all available topics on the Kafka cluster with categorization."""
         try:
             self.all_available_topics = NSPKafkaClient.discover_topics(kafka_config)
             
-            # Always use standard topic selector - TUI is not working properly
+            # Always use standard topic selector
             from nsp_topic_selector import TopicSelector
             self.topic_selector = TopicSelector(
                 self.all_available_topics, 
@@ -523,7 +523,7 @@ class NSPKafkaConsumer:
         print(self._format_message(message))
         print(f"{'='*80}\n")
 
-    def start_consuming(self, topics: Optional[List[str]] = None, discover_topics: bool = True, use_tui: bool = False):
+    def start_consuming(self, topics: Optional[List[str]] = None, discover_topics: bool = True):
         """Start consuming messages from NSP Kafka topics."""
         try:
             # Ensure valid NSP token
@@ -538,7 +538,7 @@ class NSPKafkaConsumer:
                 logger.info(f"Using provided topics: {topics}")
             elif discover_topics:
                 # First discover all available topics
-                discovered_topics = self._discover_topics(self.kafka_config, use_tui=use_tui)
+                discovered_topics = self._discover_topics(self.kafka_config)
                 
                 # Use hierarchical topic selection if topics were discovered
                 if self.topic_categories:
@@ -547,11 +547,7 @@ class NSPKafkaConsumer:
                     # Set in_menu flag before showing menu
                     self.in_menu = True
                     try:
-                        # Use TUI selector if available and requested
-                        if use_tui and hasattr(self.topic_selector, 'show_category_menu'):
-                            selected_topics = self.topic_selector.show_category_menu()
-                        else:
-                            selected_topics = self._show_category_menu()
+                        selected_topics = self._show_category_menu()
                     finally:
                         # Always clear in_menu flag
                         self.in_menu = False
@@ -780,8 +776,7 @@ def main():
     try:
         consumer.start_consuming(
             topics=topics,
-            discover_topics=not args.no_discovery,
-            use_tui=False
+            discover_topics=not args.no_discovery
         )
     except (TokenError, KafkaConnectionError, ConfigError) as e:
         logger.error(f"Consumer failed with known error: {e}")

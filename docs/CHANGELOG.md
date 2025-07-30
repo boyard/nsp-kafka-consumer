@@ -49,11 +49,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Each module now has isolated logging with proper handlers
   - Prevents log contamination when modules import each other
 
-### Removed
-- TUI (Terminal User Interface) option that was attempted but had issues:
-  - InquirerPy integration proved problematic with Enter key crashes
-  - Reverted to robust text-based menu system
-  - Removed `--tui` command line flag
 
 ## [4.1.0] - 2025-07-29
 

@@ -150,10 +150,6 @@ External NSP Infrastructure:
   - `nsp_config_loader.py`: Manages configuration parsing and validation
   - `nsp_exceptions.py`: Provides specific exceptions for better error handling
 
-### TUI UI Option
-- Attempted integration using a TUI library for enhanced interface features
-- Ran into issues with compatibility and user input handling
-- Reverted back to the traditional menu due to these challenges but kept improvements in non-UI interactive features
 
 ## Component Integration
 

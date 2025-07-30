@@ -120,6 +120,10 @@ misc/sample_topics.txt
 test_*.py
 debug_*.py
 
+# Development Context Files (local only)
+docs/LLM_SESSION_CONTEXT.md
+docs/IMPLEMENTATION_PLAN.md
+
 # Large Data Files
 *.json.gz
 *_sample.json
