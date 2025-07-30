@@ -1,0 +1,27 @@
+[NSP]
+# NSP server connection details
+server = YOUR_NSP_SERVER_IP_OR_HOSTNAME
+username = your_username
+password = your_password
+
+# OAuth2 tokens (automatically managed by the application)
+access_token = 
+refresh_token = 
+token_expiry = 
+
+[KAFKA]
+# Kafka connection settings
+bootstrap_servers = YOUR_KAFKA_SERVER:9192
+group_id = nsp-kafka-consumer
+auto_offset_reset = latest
+enable_auto_commit = true
+
+# SSL Configuration
+ssl_ca_location = ./certs/ca-cert.pem
+ssl_certfile = ./certs/client-cert.pem
+ssl_keyfile = ./certs/client-key.pem
+ssl_password = your_ssl_password
+
+# Optional: Consumer timeout and polling settings
+consumer_timeout_ms = 1000
+max_poll_records = 500

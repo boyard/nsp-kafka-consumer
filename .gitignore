@@ -1,0 +1,155 @@
+# NSP Kafka Consumer - Git Ignore Rules
+
+# Sensitive Configuration Files
+nsp_config.ini
+.env
+.env.local
+.env.production
+.env.staging
+.env.test
+
+# Certificates and Keys
+certs/
+*.p12
+*.pem
+*.key
+*.crt
+*.cer
+*.pfx
+*.jks
+
+# Log Files
+*.log
+logs/
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Development and Testing
+.coverage
+htmlcov/
+.tox/
+.cache
+.pytest_cache/
+.hypothesis/
+pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary Files
+*.tmp
+*.temp
+*.cache
+temp/
+tmp/
+.temporary/
+
+# Archives and Backups
+*.tar.gz
+*.zip
+*.rar
+*.7z
+backups/
+*.backup
+*.bak
+
+# Project Specific
+github-prep/
+misc/sample_topics.txt
+test_*.py
+debug_*.py
+
+# Large Data Files
+*.json.gz
+*_sample.json
+
+# Jupyter Notebooks (if any)
+.ipynb_checkpoints
+
+# Documentation Build
+docs/_build/
+site/
+
+# PyCharm
+.idea/
+
+# Rope
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
