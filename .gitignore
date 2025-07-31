@@ -113,6 +113,11 @@ github-prep/
 misc/sample_topics.txt
 test_*.py
 debug_*.py
+nsp_config_*.ini
+nsp_config_current.ini
+.nsp_setup_cache.json
+test_fresh_install/
+test_fresh_install_v2/
 
 # Development Context Files (local only)
 docs/LLM_SESSION_CONTEXT.md

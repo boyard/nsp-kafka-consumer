@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note**: This system evolved from a focused fault management tool to a comprehensive NSP data streaming platform capable of handling telemetry, performance metrics, service operations, and real-time analytics.
 
+## [5.2.0] - 2025-07-31
+
+### Added
+- **Improved Setup Script** (`setup_nsp_consumer.py`)
+  - **Command-line Argument Support**: Added `--debug` and `--quiet` options for customizable output
+  - **SSH Banner Suppression**: Cleaned logs by filtering unwanted SSH banner messages
+  - **Initial Token Generation**: Automatically generates an initial NSP token during setup
+  - **Automatic Token Management**: Offers automatic token refresh using cron jobs
+  - **Dynamic Path Handling**: Utilizes current directory and Python environment for cron setup
+
+### Documentation
+- Updated README.md with comprehensive setup particulars
+- Included token management section in the documentation to cover cron setup and manual instructions
+
+### Fixed
+- Removed temporary and redundant files from the project directory
+- Enhanced `.gitignore` to exclude new temporary files and directories
+
 ## [5.1.0] - 2025-07-31
 
 ### Added
@@ -217,9 +235,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Component | Current Version | File |
 |-----------|----------------|------|
-| NSP Token Manager | 4.0.0 | `nsp_token_manager.py` |
-| NSP Kafka Consumer | 4.0.0 | `nsp_kafka_consumer.py` |
+| NSP Token Manager | 5.0.0 | `nsp_token_manager.py` |
+| NSP Kafka Consumer | 5.0.0 | `nsp_kafka_consumer.py` |
+| NSP Setup Script | 3.1.0 | `setup_nsp_consumer.py` |
 | NSP Subscription Manager | 1.0.0 | `nsp_subscription_manager.py` |
 | NSP Alarm Fetcher | 1.0.0 | `nsp_alarm_fetcher.py` |
 | Test Suite | 1.0.0 | `test_*.py` files |
-| Overall Collection | 4.0.0 | Complete package |
+| Overall Collection | 5.2.0 | Complete package |

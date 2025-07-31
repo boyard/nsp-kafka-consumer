@@ -16,6 +16,7 @@ Author: Agent Mode
 """
 
 import os
+import sys
 import json
 import yaml
 import requests
@@ -24,6 +25,7 @@ import subprocess
 import time
 import getpass
 import base64
+import argparse
 from datetime import datetime
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -31,6 +33,7 @@ from urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 VERBOSE = True
+DEBUG = False  # Set to True for detailed output like listing secrets
 SETUP_CACHE_FILE = '.nsp_setup_cache.json'
 CONFIG_FILE = 'nsp_config.ini'
 
@@ -97,7 +100,7 @@ def filter_ssh_output(raw_output):
             
         is_banner = any(pattern in line_lower for pattern in ignore_patterns)
         if is_banner:
-            log(f"🛡️  Filtering banner: {line[:50]}...")
+            # Silently filter out banners without logging
             continue
             
         filtered_lines.append(line)
@@ -568,79 +571,81 @@ def handle_ssl_certificates(cluster_host, deployer_host, username, password, kaf
         log(f"📋 Available certificates in {kafka_pod_name}:{ssl_path}:")
         log(list_result)
     
-    # Copy CA certificate
-    ca_files = ['ca_cert.pem', 'internal_ca_cert.pem', 'ca-cert.pem', 'ca.crt', 'ca.pem']
-    ca_copied = False
+    # Define external certificate files to copy (excluding internal ones)
+    cert_files_to_copy = [
+        'ca_cert.pem',
+        'ca_cert.pem.exportcert',
+        'nsp.key',
+        'nsp.keystore',
+        'nsp.truststore',
+        'nsp_external_combined.pem',
+        'nsp_keystore.p12',
+        'nsp_truststore.p12'
+    ]
     
-    for ca_filename in ca_files:
-        # First, copy to remote tmp directory, then scp to local
-        remote_tmp = f"/tmp/ca-cert-{int(time.time())}.pem"
-        copy_cmd = f"kubectl cp {kafka_namespace}/{kafka_pod_name}:{ssl_path}/{ca_filename} {remote_tmp}"
-        result = run_kubectl(copy_cmd)
+    copied_files = []
+    # Copy each certificate file with its original name using two-hop method
+    for cert_filename in cert_files_to_copy:
+        # Generate unique tmp filename to avoid conflicts
+        remote_tmp = f"/tmp/{cert_filename.replace('.', '_')}-{int(time.time())}"
+        local_cert_path = os.path.join(certs_dir, cert_filename)
         
-        if result is None or "error" not in result.lower():
-            # Now copy from remote to local
-            local_ca_path = os.path.join(certs_dir, 'ca-cert.pem')
-            scp_cmd = f"scp -o StrictHostKeyChecking=no {username}@{deployer_host}:{remote_tmp} {local_ca_path}"
-            if password:
-                scp_cmd = f"sshpass -p '{password}' {scp_cmd}"
-            
-            scp_result = subprocess.getoutput(scp_cmd)
-            
-            # Clean up remote tmp file
-            run_kubectl(f"rm -f {remote_tmp}")
-            
-            # Check if file was successfully copied
-            if os.path.exists(local_ca_path) and os.path.getsize(local_ca_path) > 0:
-                log(f"✅ Successfully copied CA certificate from {ca_filename}")
-                ca_copied = True
-                break
-    
-    # Copy client certificates similarly
-    if ca_copied:
-        # Copy client cert
-        client_files = ['client-cert.pem', 'client.crt', 'tls.crt']
-        for client_filename in client_files:
-            remote_tmp = f"/tmp/client-cert-{int(time.time())}.pem"
-            copy_cmd = f"kubectl cp {kafka_namespace}/{kafka_pod_name}:{ssl_path}/{client_filename} {remote_tmp}"
-            result = run_kubectl(copy_cmd)
+        log(f"📋 Copying {cert_filename}...")
+        
+        # Step 1: Copy from pod to cluster host
+        if cluster_host == deployer_host:
+            # If deployer is also cluster host, copy directly
+            copy_cmd = f"kubectl cp {kafka_namespace}/{kafka_pod_name}:{ssl_path}/{cert_filename} {remote_tmp}"
+            result = execute_ssh_command(deployer_host, username, copy_cmd, password)
             
             if result is None or "error" not in result.lower():
-                local_cert_path = os.path.join(certs_dir, 'client-cert.pem')
+                # Copy from deployer to local
                 scp_cmd = f"scp -o StrictHostKeyChecking=no {username}@{deployer_host}:{remote_tmp} {local_cert_path}"
                 if password:
                     scp_cmd = f"sshpass -p '{password}' {scp_cmd}"
                 
                 scp_result = subprocess.getoutput(scp_cmd)
-                run_kubectl(f"rm -f {remote_tmp}")
                 
-                if os.path.exists(local_cert_path) and os.path.getsize(local_cert_path) > 0:
-                    log(f"✅ Successfully copied client certificate from {client_filename}")
-                    break
-        
-        # Copy client key
-        key_files = ['client-key.pem', 'client.key', 'tls.key']
-        for key_filename in key_files:
-            remote_tmp = f"/tmp/client-key-{int(time.time())}.pem"
-            copy_cmd = f"kubectl cp {kafka_namespace}/{kafka_pod_name}:{ssl_path}/{key_filename} {remote_tmp}"
-            result = run_kubectl(copy_cmd)
+                # Clean up temp file
+                execute_ssh_command(deployer_host, username, f"rm -f {remote_tmp}", password)
+        else:
+            # Two-hop copy: pod -> cluster -> deployer -> local
+            # Step 1: Copy from pod to cluster host
+            copy_cmd = f"kubectl cp {kafka_namespace}/{kafka_pod_name}:{ssl_path}/{cert_filename} {remote_tmp}"
+            ssh_cmd = f"ssh -o StrictHostKeyChecking=no {cluster_host} '{copy_cmd}'"
+            result = execute_ssh_command(deployer_host, username, ssh_cmd, password)
             
             if result is None or "error" not in result.lower():
-                local_key_path = os.path.join(certs_dir, 'client-key.pem')
-                scp_cmd = f"scp -o StrictHostKeyChecking=no {username}@{deployer_host}:{remote_tmp} {local_key_path}"
+                # Step 2: Copy from cluster host to deployer host
+                scp_cluster_to_deployer = f"scp -o StrictHostKeyChecking=no {cluster_host}:{remote_tmp} {remote_tmp}"
+                execute_ssh_command(deployer_host, username, scp_cluster_to_deployer, password)
+                
+                # Step 3: Copy from deployer host to local
+                scp_cmd = f"scp -o StrictHostKeyChecking=no {username}@{deployer_host}:{remote_tmp} {local_cert_path}"
                 if password:
                     scp_cmd = f"sshpass -p '{password}' {scp_cmd}"
                 
                 scp_result = subprocess.getoutput(scp_cmd)
-                run_kubectl(f"rm -f {remote_tmp}")
                 
-                if os.path.exists(local_key_path) and os.path.getsize(local_key_path) > 0:
-                    log(f"✅ Successfully copied client key from {key_filename}")
-                    break
+                # Clean up temp files on both hosts
+                execute_ssh_command(deployer_host, username, f"rm -f {remote_tmp}", password)
+                ssh_cleanup = f"ssh -o StrictHostKeyChecking=no {cluster_host} 'rm -f {remote_tmp}'"
+                execute_ssh_command(deployer_host, username, ssh_cleanup, password)
+        
+        # Check if file was successfully copied
+        if os.path.exists(local_cert_path) and os.path.getsize(local_cert_path) > 0:
+            log(f"✅ Successfully copied: {cert_filename} ({os.path.getsize(local_cert_path)} bytes)")
+            copied_files.append(cert_filename)
+        else:
+            log(f"⚠️  Failed to copy: {cert_filename}")
     
-    if not ca_copied:
-        log("⚠️  Could not copy certificates from Kafka pod, trying alternative method...")
-        # Fall back to secret extraction
+    # Summary of copied files
+    if copied_files:
+        log(f"\n📊 Successfully copied {len(copied_files)} certificate files:")
+        for f in copied_files:
+            log(f"   ✓ {f}")
+    else:
+        log("⚠️  Could not copy any certificates from Kafka pod, trying alternative method...")
     if cluster_host == deployer_host:
         def run_kubectl(cmd):
             return execute_ssh_command(cluster_host, username, cmd, password)
@@ -695,12 +700,14 @@ def extract_certificates_alternative(cluster_host, deployer_host, username, pass
     secrets_result = run_kubectl(secrets_cmd)
     
     if secrets_result:
-        log("📋 Available secrets in namespace:")
+        if DEBUG:
+            log("📋 Available secrets in namespace:")
         cert_secrets = []
         for line in secrets_result.split('\n'):
             if line.strip():
                 secret_name = line.split()[0]
-                log(f"  - {secret_name}")
+                if DEBUG:
+                    log(f"  - {secret_name}")
                 if any(keyword in secret_name.lower() for keyword in ['cert', 'tls', 'ssl', 'ca']):
                     cert_secrets.append(secret_name)
         
@@ -787,6 +794,123 @@ def create_self_signed_certificates(certs_dir):
     log(f"✅ Created self-signed certificates in {certs_dir}")
     log("⚠️  Note: Self-signed certificates may not work with all Kafka configurations")
 
+
+def setup_token_refresh_cron():
+    """Suggest and configure cron job to refresh NSP token"""
+    log("🔄 NSP Token Refresh Configuration")
+    log("" + "="*50)
+    log("NSP tokens expire after a period of time. You have two options:")
+    log("")
+    log("1. AUTOMATIC (Recommended): Set up a cron job to refresh the token every 30 minutes")
+    log("2. MANUAL: Run the token refresh script manually when needed")
+    log("")
+    
+    # Get current directory and Python executable
+    current_dir = os.getcwd()
+    python_executable = sys.executable
+    
+    # Build the cron command dynamically
+    cron_schedule = "*/30 * * * *"  # Every 30 minutes
+    cron_command = f"{cron_schedule} cd {current_dir} && {python_executable} nsp_token_manager.py >> nsp_token_manager.log 2>&1"
+    
+    choice = input("\nWould you like to set up automatic token refresh? [Y/n]: ").strip().lower()
+    
+    if choice != 'n':
+        # Try to set up the cron job
+        try:
+            # Get existing crontab
+            result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
+            if result.returncode == 0:
+                existing_crontab = result.stdout
+            else:
+                existing_crontab = ""
+            
+            # Check if our cron job already exists
+            if 'nsp_token_manager.py' in existing_crontab:
+                log("✅ A cron job for token refresh already exists")
+                log("📋 Existing cron entries for NSP:")
+                for line in existing_crontab.split('\n'):
+                    if 'nsp_token_manager.py' in line:
+                        log(f"   {line}")
+            else:
+                # Add new cron job
+                new_crontab = existing_crontab.rstrip('\n') + '\n' if existing_crontab else ''
+                new_crontab += f"# NSP Token Auto-refresh\n{cron_command}\n"
+                
+                # Install new crontab
+                process = subprocess.Popen(['crontab', '-'], stdin=subprocess.PIPE, text=True)
+                process.communicate(input=new_crontab)
+                
+                if process.returncode == 0:
+                    log("✅ Cron job successfully installed!")
+                    log(f"📋 Added cron job: {cron_command}")
+                    log("")
+                    log("The token will be automatically refreshed every 30 minutes.")
+                    log("You can check the refresh logs in: nsp_token_manager.log")
+                else:
+                    log("❌ Failed to install cron job")
+                    show_manual_setup_instructions(cron_command)
+                    
+        except Exception as e:
+            log(f"❌ Error setting up cron: {e}")
+            show_manual_setup_instructions(cron_command)
+    else:
+        log("")
+        log("⚠️  Manual Token Management Selected")
+        log("" + "="*50)
+        log("You will need to manually refresh the token before it expires.")
+        log("")
+        log("To refresh the token manually, run:")
+        log(f"   cd {current_dir}")
+        log(f"   {python_executable} nsp_token_manager.py")
+        log("")
+        log("The token typically expires after 1-2 hours of inactivity.")
+        log("If the consumer fails with authentication errors, run the above command.")
+
+def show_manual_setup_instructions(cron_command):
+    """Show manual cron setup instructions"""
+    log("")
+    log("📝 To manually set up the cron job, run:")
+    log("   crontab -e")
+    log("")
+    log("Then add this line:")
+    log(f"   {cron_command}")
+    log("")
+    log("Save and exit the editor to activate the cron job.")
+
+def generate_initial_token():
+    """Generate initial access token and update the configuration file"""
+    try:
+        # Import the token manager module
+        import nsp_token_manager
+        
+        log("🔐 Requesting initial access token...")
+        
+        # Get a valid token using the token manager
+        server, token = nsp_token_manager.get_valid_token()
+        
+        if token:
+            log(f"✅ Successfully obtained initial token: {token[:20]}...")
+            
+            # Read the current config to verify it was updated
+            config = configparser.ConfigParser()
+            config.read(CONFIG_FILE)
+            
+            # Check if token was saved
+            saved_token = config.get('NSP', 'access_token', fallback='')
+            if saved_token:
+                log("✅ Token successfully saved to configuration file")
+                return True
+            else:
+                log("⚠️  Token obtained but not saved to configuration")
+                return False
+        else:
+            log("❌ Failed to obtain initial token")
+            return False
+            
+    except Exception as e:
+        log(f"❌ Error generating initial token: {e}")
+        return False
 
 def generate_config_files(config_data):
     """Generate final configuration files based on example template"""
@@ -886,6 +1010,17 @@ def main():
         
         generate_config_files(config_data)
         
+        # Phase 8: Generate initial token and update configuration
+        log("🔍 Phase 8: Generate Initial Access Token")
+        if generate_initial_token():
+            log("✅ Initial token generated and saved to configuration")
+        else:
+            log("⚠️  Could not generate initial token - you may need to run the consumer manually first")
+        
+        # Phase 9: Set up automatic token refresh (cron)
+        log("🔍 Phase 9: Automatic Token Refresh Setup")
+        setup_token_refresh_cron()
+        
         log("✅ NSP Consumer setup completed successfully!")
         log("🎉 You can now run the NSP Kafka Consumer")
         
@@ -897,4 +1032,18 @@ def main():
         log(f"Error details: {traceback.format_exc()}")
 
 if __name__ == "__main__":
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='NSP Intelligent Discovery Script v3.0')
+    parser.add_argument('--debug', '-d', action='store_true', 
+                        help='Enable debug output (shows all secrets in namespace)')
+    parser.add_argument('--quiet', '-q', action='store_true',
+                        help='Minimal output mode')
+    args = parser.parse_args()
+    
+    # Set global flags based on arguments
+    if args.debug:
+        DEBUG = True
+    if args.quiet:
+        VERBOSE = False
+    
     main()

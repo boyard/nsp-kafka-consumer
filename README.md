@@ -1,8 +1,8 @@
 # NSP Kafka Consumer
 
-**Version:** 5.0.0
+**Version:** 5.2.0
 
-**Latest Release:** setup_nsp_consumer_v3.0
+**Latest Release:** Enhanced Setup with Auto Token Management
 **Status:** Stable
 
 ## Overview
@@ -58,15 +58,33 @@ pip install -r requirements.txt
 For new users, we provide an intelligent setup script that automates the entire configuration process:
 
 ```bash
-python3 setup_nsp_consumer_v3.py
+python3 setup_nsp_consumer.py
 ```
 
 This script will:
-- Connect to your NSP deployer host
-- Discover NSP cluster and Kafka services automatically
-- Extract SSL certificates from the cluster
+- Connect to your NSP deployer host via SSH
+- Automatically discover NSP cluster hosts and Kafka services
+- Extract SSL certificates from the Kafka pods
 - Generate a complete `nsp_config.ini` configuration file
 - Set up the `certs/` directory with all required certificates
+- Generate an initial access token for immediate use
+- Optionally configure automatic token refresh via cron job
+
+**Setup Script Options:**
+- `--debug` or `-d`: Enable verbose output showing all discovered resources
+- `--quiet` or `-q`: Minimal output mode for automated environments
+
+Example:
+```bash
+# Standard setup with interactive prompts
+python3 setup_nsp_consumer.py
+
+# Debug mode to see all discovered secrets and services
+python3 setup_nsp_consumer.py --debug
+
+# Quiet mode for automation
+python3 setup_nsp_consumer.py --quiet
+```
 
 **Option 2: Manual Configuration**
 
@@ -101,6 +119,34 @@ ssl_keyfile = ./certs/client-key.pem
 **If using the setup script**: Certificates are intelligently discovered, extracted, and configured automatically.
 
 **If configuring manually**: Create a `certs` directory and place your SSL certificate files (`ca-cert.pem`, `client-cert.pem`, `client-key.pem`) inside it. Ensure the paths in your `nsp_config.ini` file match their locations.
+
+### 5. Token Management
+
+NSP uses OAuth2 authentication with access tokens that expire periodically. This project includes automatic token management:
+
+**Automatic Token Refresh (Recommended)**
+
+During setup, you'll be prompted to configure automatic token refresh via cron. If you accept, a cron job will be created that runs every 30 minutes:
+
+```bash
+*/30 * * * * cd /your/project/directory && /path/to/python nsp_token_manager.py >> nsp_token_manager.log 2>&1
+```
+
+This ensures your consumer always has a valid token without manual intervention.
+
+**Manual Token Management**
+
+If you prefer manual control, you can refresh tokens on-demand:
+
+```bash
+python3 nsp_token_manager.py
+```
+
+The token manager will:
+- Check if the current token is still valid
+- Automatically refresh it if expired or expiring soon
+- Update the `nsp_config.ini` file with the new token
+- Log all token operations for auditing
 
 ## Usage
 
