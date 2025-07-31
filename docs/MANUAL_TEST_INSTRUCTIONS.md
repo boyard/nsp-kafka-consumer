@@ -4,7 +4,7 @@
 
 1. Start the consumer:
    ```bash
-   cd /Users/engels/NSPlayground/KTnV
+   cd /path/to/nsp-kafka-consumer
    source .venv/bin/activate
    python3 nsp_kafka_consumer.py --topics nsp-yang-model.change-notif --no-discovery
    ```
@@ -22,7 +22,7 @@
 
 1. Start the consumer:
    ```bash
-   cd /Users/engels/NSPlayground/KTnV
+   cd /path/to/nsp-kafka-consumer
    source .venv/bin/activate
    python3 nsp_kafka_consumer.py
    ```

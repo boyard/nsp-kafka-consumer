@@ -771,7 +771,31 @@ def main():
             sys.exit(1)
     
     # Create and start consumer
-    consumer = NSPKafkaConsumer()
+    try:
+        consumer = NSPKafkaConsumer()
+    except ConfigError as e:
+        # ConfigError already has a nice formatted message
+        print(str(e))
+        sys.exit(1)
+    except FileNotFoundError as e:
+        print("\n❌ Configuration Error")
+        print("─" * 50)
+        print("The NSP Kafka Consumer is not configured yet.")
+        print("\nPlease run the setup script first:")
+        print("  python3 setup_nsp_consumer.py")
+        print("\nThis will:")
+        print("  • Create the configuration file (nsp_config.ini)")
+        print("  • Set up SSL certificates")
+        print("  • Configure NSP and Kafka connections")
+        print("─" * 50)
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"Failed to initialize consumer: {e}")
+        error_first_line = str(e).split('\n')[0]
+        print(f"\n❌ Initialization Error: {error_first_line}")
+        print("\nIf this is a fresh installation, please run:")
+        print("  python3 setup_nsp_consumer.py")
+        sys.exit(1)
     
     try:
         consumer.start_consuming(

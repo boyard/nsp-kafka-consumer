@@ -51,9 +51,44 @@ class ConfigLoader:
     def _load_config(self) -> configparser.ConfigParser:
         config = configparser.ConfigParser()
         if not os.path.exists(self.config_file):
-            raise FileNotFoundError(f"Configuration file '{self.config_file}' not found.")
+            self._raise_config_not_found_error()
         config.read(self.config_file)
         return config
+    
+    def _raise_config_not_found_error(self):
+        """Raise a helpful error when config file is not found."""
+        error_msg = f"\n❌ Configuration file '{self.config_file}' not found.\n"
+        
+        # Check for setup scripts
+        setup_scripts = []
+        for script in ['setup_nsp_consumer_v3.py', 'setup_nsp_consumer_v2.py', 'setup_nsp_consumer.py']:
+            if os.path.exists(script):
+                setup_scripts.append(script)
+                break  # Use the first one found
+        
+        # Check for example config
+        example_config = 'nsp_config.ini.example'
+        has_example = os.path.exists(example_config)
+        
+        error_msg += "\n🔧 To fix this issue, you have two options:\n\n"
+        
+        if setup_scripts:
+            error_msg += f"1. Run the setup script to automatically generate the configuration:\n"
+            error_msg += f"   python3 {setup_scripts[0]}\n\n"
+        
+        if has_example:
+            error_msg += f"2. Copy and customize the example configuration file:\n"
+            error_msg += f"   cp {example_config} {self.config_file}\n"
+            error_msg += f"   # Then edit {self.config_file} with your NSP server details\n\n"
+        elif not setup_scripts:
+            error_msg += f"2. Create a configuration file manually at '{self.config_file}'\n"
+            error_msg += f"   with [NSP] and [KAFKA] sections containing your server details.\n\n"
+        
+        error_msg += "📚 The configuration file should contain:\n"
+        error_msg += "   • [NSP] section with server, username, password\n"
+        error_msg += "   • [KAFKA] section with bootstrap_servers and SSL settings\n"
+        
+        raise ConfigError(error_msg)
 
     def get_kafka_config(self) -> Dict[str, str]:
         if not self.config.has_section('KAFKA'):

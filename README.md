@@ -1,6 +1,8 @@
 # NSP Kafka Consumer
 
 **Version:** 5.0.0
+
+**Latest Release:** setup_nsp_consumer_v3.0
 **Status:** Stable
 
 ## Overview
@@ -51,33 +53,54 @@ pip install -r requirements.txt
 
 ### 3. Configure the Application
 
-Configuration is managed through environment variables. Create a `.env` file by copying the example:
+**Option 1: Use the Setup Script (Recommended for New Users)**
+
+For new users, we provide an intelligent setup script that automates the entire configuration process:
 
 ```bash
-cp .env.example .env
+python3 setup_nsp_consumer_v3.py
 ```
 
-Now, edit the `.env` file with your specific NSP and Kafka details:
+This script will:
+- Connect to your NSP deployer host
+- Discover NSP cluster and Kafka services automatically
+- Extract SSL certificates from the cluster
+- Generate a complete `nsp_config.ini` configuration file
+- Set up the `certs/` directory with all required certificates
+
+**Option 2: Manual Configuration**
+
+For advanced users or custom setups, create a configuration file by copying the example:
+
+```bash
+cp nsp_config.ini.example nsp_config.ini
+```
+
+Then edit `nsp_config.ini` with your specific NSP and Kafka details:
 
 ```ini
-# NSP Server Configuration
-NSP_SERVER=YOUR_NSP_SERVER_IP_OR_HOSTNAME
-NSP_USERNAME=your_username
-NSP_PASSWORD=your_password
+[NSP]
+server = YOUR_NSP_SERVER_IP_OR_HOSTNAME
+username = your_username
+password = your_password
 
-# Kafka Configuration
-KAFKA_BOOTSTRAP_SERVERS=YOUR_KAFKA_SERVER:9192
+[KAFKA]
+bootstrap_servers = YOUR_KAFKA_SERVER:9192
+group_id = nsp-kafka-consumer
 
-# SSL Configuration (provide paths to your certs)
-KAFKA_SSL_CA_LOCATION=./certs/ca-cert.pem
-# ... add other SSL settings if needed
+# SSL Configuration
+ssl_ca_location = ./certs/ca-cert.pem
+ssl_certfile = ./certs/client-cert.pem
+ssl_keyfile = ./certs/client-key.pem
 ```
 
-**Note**: The `.env` file is ignored by Git, so your credentials will remain secure.
+**Note**: The `nsp_config.ini` file is ignored by Git, so your credentials will remain secure.
 
-### 4. Place Your Certificates
+### 4. SSL Certificates
 
-Create a `certs` directory and place your SSL certificate files (`ca-cert.pem`, etc.) inside it. Ensure the paths in your `.env` file match their locations.
+**If using the setup script**: Certificates are intelligently discovered, extracted, and configured automatically.
+
+**If configuring manually**: Create a `certs` directory and place your SSL certificate files (`ca-cert.pem`, `client-cert.pem`, `client-key.pem`) inside it. Ensure the paths in your `nsp_config.ini` file match their locations.
 
 ## Usage
 

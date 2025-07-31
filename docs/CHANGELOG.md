@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note**: This system evolved from a focused fault management tool to a comprehensive NSP data streaming platform capable of handling telemetry, performance metrics, service operations, and real-time analytics.
 
+## [5.1.0] - 2025-07-31
+
+### Added
+- **NSP Intelligent Discovery Script v3.0** (`setup_nsp_consumer_v3.py`)
+  - **Intelligent SSL Certificate Extraction**: Automatically discovers and extracts SSL certificates from Kubernetes cluster secrets
+  - **Multi-source Certificate Discovery**: Tries multiple secret sources and certificate formats (tls.crt, ca.crt, client.crt, etc.)
+  - **Fallback Certificate Generation**: Creates self-signed certificates as fallback when cluster certificates unavailable
+  - **Enhanced Error Handling**: Robust JSON parsing and certificate validation with detailed logging
+  - **Alternative Secret Analysis**: Scans all namespace secrets for certificate-related data
+  - **Complete End-to-End Automation**: From deployer host credentials to fully operational Kafka consumer
+
+### Changed
+- **Documentation Cleanup**: Removed confusing `.env.example` file duplication
+  - Updated all documentation to focus on `nsp_config.ini` configuration approach
+  - Simplified user experience by eliminating environment variable confusion
+  - Updated README, CONTRIBUTING, and gitignore files accordingly
+- **Certificate Management**: Enhanced from basic stub to production-ready extraction system
+- **Setup Script Evolution**: Progressed from v1.0 (552 lines) → v2.0 (702 lines) → v3.0 (819 lines)
+
+### Fixed
+- **Certificate Extraction Issues**: Resolved JSON parsing errors and secret access problems
+- **String Index Errors**: Fixed certificate data processing with proper type checking
+- **Missing Function Dependencies**: Added all required helper functions for certificate management
+- **Configuration Template Usage**: Now properly uses `nsp_config.ini.example` as template base
+
 ## [5.0.0] - 2025-07-30
 
 ### Added

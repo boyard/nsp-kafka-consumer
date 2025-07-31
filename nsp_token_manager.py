@@ -65,7 +65,13 @@ def is_active_time():
 def get_token_from_config(config):
     """Retrieve a token from the config if it exists and is not expired."""
     try:
-        expiry_time = config.getfloat('NSP', 'token_expiry')
+        # Get token_expiry as string first to check if it's empty
+        expiry_str = config.get('NSP', 'token_expiry', fallback='').strip()
+        if not expiry_str:
+            # Empty token_expiry means no valid token
+            return None
+            
+        expiry_time = float(expiry_str)
         access_token = config.get('NSP', 'access_token')
         refresh_token = config.get('NSP', 'refresh_token')
 

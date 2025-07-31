@@ -2,11 +2,6 @@
 
 # Sensitive Configuration Files
 nsp_config.ini
-.env
-.env.local
-.env.production
-.env.staging
-.env.test
 
 # Certificates and Keys
 certs/
@@ -48,7 +43,6 @@ share/python-wheels/
 MANIFEST
 
 # Virtual Environments
-.env
 .venv
 env/
 venv/

@@ -104,18 +104,29 @@ External NSP Infrastructure:
 
 ## Data Flow
 
-1. **Authentication Flow**:
+1. **Initial Setup Flow** (New User Experience):
+   - User runs `setup_nsp_consumer_v3.py` with only deployer host credentials
+   - Script connects to NSP deployer host via SSH (key or password)
+   - Discovers NSP cluster hosts from `k8s-deployer.yml` configuration
+   - Identifies Kafka pods and NSP UI ingress endpoints automatically
+   - Authenticates with NSP UI and obtains OAuth2 tokens
+   - **Intelligently extracts SSL certificates** from Kubernetes cluster secrets
+   - Generates complete `nsp_config.ini` configuration file
+   - Creates `certs/` directory with all required SSL certificates
+   - **Result**: Fully operational Kafka consumer ready for immediate use
+
+2. **Authentication Flow**:
    - Cron job triggers token manager every 30 minutes
-   - Token manager authenticates with NSP OAuth2 server
+   - Token manager authenticates with NSP OAuth2 server using setup-generated config
    - Valid tokens are stored and used by all components
 
-2. **Data Streaming Flow**:
-   - Kafka consumer authenticates using stored tokens
+3. **Data Streaming Flow**:
+   - Kafka consumer authenticates using stored tokens and setup-extracted certificates
    - Topic discovery identifies 167+ available data streams
    - Interactive menu allows category-based topic selection
    - Real-time consumption with JSON formatting and error handling
 
-3. **Topic Management Flow**:
+4. **Topic Management Flow**:
    - Dynamic subscription changes during active consumption
    - Consumer recreation ensures reliable message flow
    - Graceful shutdown with proper offset commits

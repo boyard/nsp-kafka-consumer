@@ -23,8 +23,12 @@ Thank you for your interest in contributing to the NSP Kafka Consumer project! T
 
 3. Set up your configuration:
    ```bash
-   cp .env.example .env
-   # Edit .env with your settings
+   # Option 1: Use the setup script (recommended)
+   python3 setup_nsp_consumer_v3.py
+   
+   # Option 2: Manual configuration
+   cp nsp_config.ini.example nsp_config.ini
+   # Edit nsp_config.ini with your settings
    ```
 
 ## Code Style and Standards
@@ -84,7 +88,7 @@ When reporting issues, please include:
 ## Security Considerations
 
 - Never commit credentials, tokens, or certificates
-- Use environment variables for sensitive configuration
+- Store sensitive configuration in `nsp_config.ini` (which is gitignored)
 - Test with dummy/example data when possible
 - Follow secure coding practices
 

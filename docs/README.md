@@ -102,7 +102,7 @@ This directory contains a complete set of Python scripts for working with Nokia 
 
 A cron job is configured to automatically refresh NSP tokens every 30 minutes:
 ```bash
-*/30 * * * * cd /Users/engels/NSPlayground/KTnV && ./.venv/bin/python3 nsp_token_manager.py >> nsp_token_manager.log 2>&1
+*/30 * * * * cd /path/to/nsp-kafka-consumer && ./.venv/bin/python3 nsp_token_manager.py >> nsp_token_manager.log 2>&1
 ```
 
 To view/edit the cron job:
