@@ -100,7 +100,7 @@ Then edit `nsp_config.ini` with your specific NSP and Kafka details:
 ```ini
 [NSP]
 server = YOUR_NSP_SERVER_IP_OR_HOSTNAME
-username = your_username
+user = your_username
 password = your_password
 
 [KAFKA]
@@ -108,9 +108,9 @@ bootstrap_servers = YOUR_KAFKA_SERVER:9192
 group_id = nsp-kafka-consumer
 
 # SSL Configuration
-ssl_ca_location = ./certs/ca-cert.pem
-ssl_certfile = ./certs/client-cert.pem
-ssl_keyfile = ./certs/client-key.pem
+ssl_cafile = ./certs/ca_cert.pem
+ssl_certfile = ./certs/client_cert.pem
+ssl_keyfile = ./certs/client_key.pem
 ```
 
 **Note**: The `nsp_config.ini` file is ignored by Git, so your credentials will remain secure.
@@ -119,7 +119,7 @@ ssl_keyfile = ./certs/client-key.pem
 
 **If using the setup script**: Certificates are intelligently discovered, extracted, and configured automatically.
 
-**If configuring manually**: Create a `certs` directory and place your SSL certificate files (`ca-cert.pem`, `client-cert.pem`, `client-key.pem`) inside it. Ensure the paths in your `nsp_config.ini` file match their locations.
+**If configuring manually**: Create a `certs` directory and place your SSL certificate files (`ca_cert.pem`, `client_cert.pem`, `client_key.pem`) inside it. Ensure the paths in your `nsp_config.ini` file match their locations.
 
 ### 5. Token Management
 
