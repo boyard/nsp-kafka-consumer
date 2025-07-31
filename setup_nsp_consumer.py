@@ -731,7 +731,7 @@ def extract_certificates_alternative(cluster_host, deployer_host, username, pass
                     for ca_key in ca_keys:
                         if ca_key in data:
                             ca_data = base64.b64decode(data[ca_key]).decode('utf-8')
-                            ca_file = os.path.join(certs_dir, 'ca-cert.pem')
+                            ca_file = os.path.join(certs_dir, 'ca_cert.pem')
                             with open(ca_file, 'w') as f:
                                 f.write(ca_data)
                             log(f"✅ Extracted CA certificate from {secret_name}:{ca_key}")

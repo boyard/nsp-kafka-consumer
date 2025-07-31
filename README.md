@@ -25,6 +25,7 @@ This project provides a comprehensive Python-based Kafka consumer for subscribin
 
 - Python 3.8+
 - Access to a Nokia NSP instance with Kafka streaming enabled
+- Valid NSP user credentials (username and password) with appropriate permissions
 - Kafka SSL certificates (CA certificate, client certificate, and client key)
 
 ### 1. Set Up the Environment
