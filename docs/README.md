@@ -1,12 +1,14 @@
-# NSP Python Scripts Collection
+# NSP Python Scripts Collection - LAB TESTING ONLY
 
-**Current Version: 5.0.0** | [View Changelog](CHANGELOG.md)
+⚠️ **WARNING: THIS IS A HOMEBREW LAB PROJECT - NOT PRODUCTION READY - USE AT YOUR OWN RISK** ⚠️
 
-This directory contains a complete set of Python scripts for working with Nokia NSP (Network Services Platform) data streaming and real-time monitoring. The system provides access to comprehensive NSP telemetry including fault management, performance metrics, service operations, analytics, and system events via Kafka integration.
+**Current Version: 5.2.0** | [View Changelog](CHANGELOG.md)
 
-## ✅ Current Status
+This directory contains experimental Python scripts for testing Nokia NSP (Network Services Platform) data streaming in LAB ENVIRONMENTS ONLY. This is a personal learning project for experimenting with NSP telemetry in controlled lab settings.
 
-**Development Status**: Production ready with latest fixes.
+## ⚠️ Current Status
+
+**Development Status**: LAB TESTING ONLY - NOT FOR PRODUCTION USE.
 
 **Recent Fixes (v4.1.0)**:
 - ✅ **Fixed**: Dynamic topic management removed - topics now selected once at startup
@@ -227,9 +229,11 @@ python3 nsp_kafka_consumer.py --no-discovery
 
 ## Version Information
 
-- **Current Version**: 5.0.0 (2025-07-30)
-- **Version History**: See [CHANGELOG.md](CHANGELOG.md) for complete version history
-- **Versioning Scheme**: Semantic Versioning (Major.Minor.Patch)
+⚠️ **REMINDER: LAB/TESTING USE ONLY - NOT PRODUCTION READY** ⚠️
+
+- **Current Version**: 5.2.0 (2025-07-31)
+- **Version History**: See [CHANGELOG.md](CHANGELOG.md) for experimental version history
+- **Purpose**: Personal learning and lab experimentation only
 
 ### Latest Changes (v4.1.0)
 - ✅ **FIXED**: Removed dynamic topic management - topics now selected once at startup
@@ -237,7 +241,7 @@ python3 nsp_kafka_consumer.py --no-discovery
 - ✅ **NEW**: Multi-category topic selection workflow - build topic list before subscribing
 - ✅ **NEW**: Visual indicators showing selected topics and categories
 - ✅ **IMPROVED**: Cleaner signal handling prevents "Bad file descriptor" errors
-- **Production Ready**: All critical issues resolved
+- **Lab Testing Only**: Experimental code for learning purposes
 
 ## LLM-Assisted Development
 

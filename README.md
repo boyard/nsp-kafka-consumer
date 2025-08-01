@@ -1,13 +1,15 @@
-# NSP Kafka Consumer
+# NSP Kafka Consumer - LAB TESTING ONLY
+
+⚠️ **WARNING: THIS IS A HOMEBREW LAB PROJECT - NOT PRODUCTION READY - USE AT YOUR OWN RISK** ⚠️
 
 **Version:** 5.2.0
 
 **Latest Release:** Enhanced Setup with Auto Token Management
-**Status:** Stable
+**Status:** Experimental Lab Testing
 
 ## Overview
 
-This project provides a comprehensive Python-based Kafka consumer for subscribing to and processing real-time data streams from Nokia's Network Services Platform (NSP). It is designed to be a modular, configurable, and robust tool for monitoring NSP events, alarms, and other data types via Kafka topics.
+This is an experimental Python-based Kafka consumer for testing data streams from Nokia's Network Services Platform (NSP) in LAB ENVIRONMENTS ONLY. It is a personal learning project for experimenting with NSP events, alarms, and other data types via Kafka topics.
 
 ### Key Features
 

@@ -24,6 +24,7 @@ except ImportError:
 
 # Import custom exceptions
 from nsp_exceptions import KafkaConnectionError, MessageProcessingError
+from nsp_message_formatter import NSPMessageFormatter
 
 logger = logging.getLogger(__name__)
 
@@ -233,16 +234,22 @@ class MessageFormatter:
                 else:
                     decoded_value = str(message.value)
                 
-                # Clean the text to remove problematic characters
-                cleaned_value = MessageFormatter.clean_text(decoded_value)
-                
-                # Try to parse as JSON
-                try:
-                    result['value'] = json.loads(cleaned_value)
-                    result['value_type'] = 'json'
-                except json.JSONDecodeError:
-                    result['value'] = cleaned_value
-                    result['value_type'] = 'text'
+                # Check if this is a Nokia NSP format message
+                if NSPMessageFormatter.is_nokia_format(decoded_value):
+                    parsed = NSPMessageFormatter.format_nokia_text_message(decoded_value)
+                    result['value'] = parsed
+                    result['value_type'] = 'nokia_nspos'
+                else:
+                    # Clean the text to remove problematic characters
+                    cleaned_value = MessageFormatter.clean_text(decoded_value)
+                    
+                    # Try to parse as JSON
+                    try:
+                        result['value'] = json.loads(cleaned_value)
+                        result['value_type'] = 'json'
+                    except json.JSONDecodeError:
+                        result['value'] = cleaned_value
+                        result['value_type'] = 'text'
                     
             except Exception as e:
                 logger.error(f"Error processing message value: {e}")
@@ -279,6 +286,9 @@ class MessageFormatter:
         
         if message_data['value_type'] == 'json':
             print(json.dumps(message_data['value'], indent=2, ensure_ascii=False))
+        elif message_data['value_type'] == 'nokia_nspos':
+            formatted = NSPMessageFormatter.format_display(message_data['value'])
+            print(formatted)
         else:
             print(message_data['value'])
         

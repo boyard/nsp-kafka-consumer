@@ -1,10 +1,14 @@
+# WARNING: HOMEBREW LAB TESTING PROJECT - NOT PRODUCTION READY
+# This configuration is for experimental lab use only
+# USE AT YOUR OWN RISK - NO WARRANTY PROVIDED
+
 [NSP]
 server = <nsp_server_ip>
 user = <username>
 password = <password>
 access_token = 
 refresh_token = 
-token_expiry = 
+token_expiry =
 
 [KAFKA]
 bootstrap_servers = <kafka_server_ip>:9192

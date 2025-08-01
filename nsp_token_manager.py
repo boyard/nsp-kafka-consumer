@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """
-NSP Token Manager
+NSP Token Manager - LAB TESTING ONLY
+
+⚠️  WARNING: HOMEBREW LAB TESTING PROJECT - NOT PRODUCTION READY
+⚠️  This is experimental code for learning purposes only
+⚠️  USE AT YOUR OWN RISK - NO WARRANTY PROVIDED
+
 Automatically manages Nokia NSP authentication tokens with refresh capability.
 
 Features:
@@ -11,7 +16,7 @@ Features:
 - File-based token persistence in INI format
 
 
-Version: 1.1
+Version: 1.1 (LAB TESTING)
 Date: 2025-01-28
 """
 

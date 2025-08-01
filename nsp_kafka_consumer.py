@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """
-NSP Kafka Consumer (Generic)
+NSP Kafka Consumer (Generic) - LAB TESTING ONLY
+
+⚠️  WARNING: HOMEBREW LAB TESTING PROJECT - NOT PRODUCTION READY
+⚠️  This is experimental code for learning purposes only
+⚠️  USE AT YOUR OWN RISK - NO WARRANTY PROVIDED
+
 Consumes Nokia NSP Kafka topics and displays messages in human-readable JSON format.
 
 Features:
@@ -13,7 +18,7 @@ Features:
 - Graceful shutdown and error handling
 - No dynamic topic changes during runtime (topics selected once at startup)
 
-Version: 2.1
+Version: 2.1 (LAB TESTING)
 Date: 2025-01-29
 """
 
@@ -570,7 +575,10 @@ class NSPKafkaConsumer:
             
             # Start consuming
             logger.info(f"[Session {self.session_id}] Starting message consumption...")
-            print(f"\n🚀 NSP Kafka Consumer Started")
+            print(f"\n⚠️  WARNING: HOMEBREW LAB TESTING PROJECT - NOT PRODUCTION READY")
+            print(f"⚠️  This is experimental code for learning purposes only")
+            print(f"⚠️  USE AT YOUR OWN RISK - NO WARRANTY PROVIDED\n")
+            print(f"🚀 NSP Kafka Consumer Started")
             print(f"🆔 Session ID: {self.session_id}")
             print(f"📡 Broker: {self.kafka_config['bootstrap_servers'][0]}")
             print(f"📋 Topics: {', '.join(self.topics)}")

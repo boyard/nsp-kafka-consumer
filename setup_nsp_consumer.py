@@ -2,6 +2,10 @@
 """
 NSP Intelligent Discovery Script v3.0
 
+⚠️  WARNING: HOMEBREW LAB TESTING PROJECT - NOT PRODUCTION READY
+⚠️  This is experimental code for learning purposes only
+⚠️  USE AT YOUR OWN RISK - NO WARRANTY PROVIDED
+
 Proper workflow:
 1. Connect to NSP Deployer Host via SSH
 2. Parse k8s-deployer.yml to find NSP Cluster Host IPs
@@ -12,7 +16,7 @@ Proper workflow:
 
 This approach correctly separates deployer functions from cluster functions.
 
-Author: Agent Mode
+Author: Homebrew Lab Testing
 """
 
 import os
@@ -944,6 +948,12 @@ def generate_config_files(config_data):
 
 def main():
     """Main execution flow"""
+    log("⚠️  " + "="*60 + " ⚠️")
+    log("⚠️  WARNING: HOMEBREW LAB TESTING PROJECT - NOT PRODUCTION READY")
+    log("⚠️  This is experimental code for learning purposes only")
+    log("⚠️  USE AT YOUR OWN RISK - NO WARRANTY PROVIDED")
+    log("⚠️  " + "="*60 + " ⚠️")
+    log("")
     log("🚀 NSP Intelligent Discovery Script v3.0 Started")
     
     try:

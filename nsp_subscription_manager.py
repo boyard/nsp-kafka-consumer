@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 """
+NSP Subscription Manager - LAB TESTING ONLY
+
+⚠️  WARNING: HOMEBREW LAB TESTING PROJECT - NOT PRODUCTION READY
+⚠️  This is experimental code for learning purposes only
+⚠️  USE AT YOUR OWN RISK - NO WARRANTY PROVIDED
+"""
+"""
 NSP Notification Subscription Manager
 Manages NSP notification subscriptions via REST API before consuming Kafka messages.
 

@@ -1,11 +1,13 @@
-# Changelog
+# Changelog - LAB TESTING PROJECT
 
-All notable changes to the NSP Python Scripts Collection will be documented in this file.
+⚠️ **WARNING: THIS IS A HOMEBREW LAB PROJECT - NOT PRODUCTION READY - USE AT YOUR OWN RISK** ⚠️
+
+All experimental changes to the NSP Python Scripts LAB TESTING Collection will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-**Note**: This system evolved from a focused fault management tool to a comprehensive NSP data streaming platform capable of handling telemetry, performance metrics, service operations, and real-time analytics.
+**Note**: This is a personal learning project that evolved from basic fault management experiments to comprehensive NSP data streaming tests in LAB ENVIRONMENTS ONLY.
 
 ## [5.2.0] - 2025-07-31
 
