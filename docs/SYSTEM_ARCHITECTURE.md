@@ -10,11 +10,12 @@ The NSP Python Scripts Collection provides a comprehensive data streaming platfo
 │                          NSP Data Streaming Platform                            │
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                 │
-│  ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────────────┐ │
-│  │   Cron Job      │    │  Token Manager   │    │     Configuration           │ │
-│  │  (every 30min)  │───▶│ nsp_token_       │◀───│   nsp_config.ini            │ │
-│  │                 │    │ manager.py       │    │   - NSP endpoints           │ │
-│  └─────────────────┘    │                  │    │   - OAuth2 credentials     │ │
+│                                                                                 │
+│                         ┌──────────────────┐    ┌─────────────────────────────┐ │
+│                         │  Token Manager   │    │     Configuration           │ │
+│                         │ nsp_token_       │◀───│   nsp_config.ini            │ │
+│                         │ manager.py       │    │   - NSP endpoints           │ │
+│                         │                  │    │   - OAuth2 credentials     │ │
 │                         │ - OAuth2 flow    │    │   - Kafka brokers          │ │
 │                         │ - Token refresh  │    │   - SSL/TLS settings       │ │
 │                         │ - Time windows   │    │   - Timeouts & retries     │ │
@@ -116,8 +117,8 @@ External NSP Infrastructure:
    - **Result**: Fully operational Kafka consumer ready for immediate use
 
 2. **Authentication Flow**:
-   - Cron job triggers token manager every 30 minutes
-   - Token manager authenticates with NSP OAuth2 server using setup-generated config
+   - Token manager handles OAuth2 authentication automatically
+   - Refresh tokens are used to obtain new access tokens when needed
    - Valid tokens are stored and used by all components
 
 3. **Data Streaming Flow**:
@@ -146,7 +147,7 @@ External NSP Infrastructure:
 - **Maintainability**: Comprehensive module-specific logging per component
 - **Robust Logging**: Each script now has isolated log files to prevent cross-contamination
 - **Operational Excellence**
-- **Automated**: Cron-based token refresh, minimal manual intervention
+- **Automated**: OAuth2 refresh token flow, minimal manual intervention
 - **Interactive**: Menu-driven topic selection and management
 - **Flexible**: Discovery and no-discovery modes, configurable timeouts
 - **Observable**: Detailed logging across all components

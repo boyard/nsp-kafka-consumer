@@ -100,18 +100,12 @@ This directory contains experimental Python scripts for testing Nokia NSP (Netwo
    python3 test_complete_fm.py
    ```
 
-## Automated Token Refresh
+## Token Management
 
-A cron job is configured to automatically refresh NSP tokens every 30 minutes:
-```bash
-*/30 * * * * cd /path/to/nsp-kafka-consumer && ./.venv/bin/python3 nsp_token_manager.py >> nsp_token_manager.log 2>&1
-```
-
-To view/edit the cron job:
-```bash
-crontab -l  # View current cron jobs
-crontab -e  # Edit cron jobs
-```
+The NSP consumer uses OAuth2 refresh tokens to automatically maintain authentication:
+- Tokens are automatically refreshed when needed using the refresh token
+- No manual intervention or scheduled tasks required
+- The token manager handles the complete OAuth2 flow transparently
 
 ## Modularization
 
@@ -128,7 +122,7 @@ The previous monolithic design was separated into modular components to improve 
   - OAuth2 refresh tokens with automatic renewal
   - Enhanced network error handling with graceful failure modes
   - Interactive prompts in manual mode to resolve token issues
-  - Silent operation in cron mode (no prompts, only logging)
+  - Silent operation when called programmatically (no prompts, only logging)
   - Detects "no route to host" and provides clear error messages
 - **Time-based operation window** (Melbourne timezone, 5 AM - 10 PM)
 - **File-based token persistence** in INI format

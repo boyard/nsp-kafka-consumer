@@ -639,17 +639,17 @@ class NSPKafkaConsumer:
         """Clean up resources with timeout to prevent hanging."""
         logger.info(f"[Session {self.session_id}] Cleaning up Kafka client resources...")
         
+        # Store message count before disconnecting
+        message_count = 0
         if self.kafka_client:
+            message_count = self.kafka_client.get_message_count()
             self.kafka_client.disconnect()
             self.kafka_client = None
         
         # Print session summary
         print(f"\n📊 Session Summary:")
         print(f"🆔 Session ID: {self.session_id}")
-        if self.kafka_client:
-            print(f"   Total messages received: {self.kafka_client.get_message_count()}")
-        else:
-            print(f"   Total messages received: 0")
+        print(f"   Total messages received: {message_count}")
         if self.topics:
             print(f"   Topics monitored: {', '.join(self.topics)}")
         else:

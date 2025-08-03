@@ -16,12 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Command-line Argument Support**: Added `--debug` and `--quiet` options for customizable output
   - **SSH Banner Suppression**: Cleaned logs by filtering unwanted SSH banner messages
   - **Initial Token Generation**: Automatically generates an initial NSP token during setup
-  - **Automatic Token Management**: Offers automatic token refresh using cron jobs
-  - **Dynamic Path Handling**: Utilizes current directory and Python environment for cron setup
+  - **Automatic Token Management**: Handles OAuth2 token refresh automatically when needed
+  - **Dynamic Path Handling**: Utilizes current directory and Python environment
 
 ### Documentation
 - Updated README.md with comprehensive setup particulars
-- Included token management section in the documentation to cover cron setup and manual instructions
 
 ### Fixed
 - Removed temporary and redundant files from the project directory
@@ -86,7 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added connectivity checks and graceful error messages
   - Interactive prompts in manual mode for token renewal/refresh
   - Proper handling of "no route to host" errors
-  - Works seamlessly in both manual and cron modes (no prompts in cron)
+  - Works seamlessly in both manual and programmatic modes
 - Configuration loading with environment variable support
 - **Critical Logging Fix**: Resolved cross-module log pollution
   - Changed from root logger (`logging.basicConfig()`) to module-specific loggers
@@ -211,7 +210,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuration management:
   - `nsp_config.ini` - Centralized NSP configuration file
   - Certificate management under `certs/` directory for secure connections
-- Automated cron job for continuous token refresh every 30 minutes
+- Automated OAuth2 token refresh mechanism
 - Python virtual environment setup with all required dependencies
 - Comprehensive logging system with separate log files per component
 

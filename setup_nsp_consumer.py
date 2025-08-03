@@ -799,88 +799,6 @@ def create_self_signed_certificates(certs_dir):
     log("⚠️  Note: Self-signed certificates may not work with all Kafka configurations")
 
 
-def setup_token_refresh_cron():
-    """Suggest and configure cron job to refresh NSP token"""
-    log("🔄 NSP Token Refresh Configuration")
-    log("" + "="*50)
-    log("NSP tokens expire after a period of time. You have two options:")
-    log("")
-    log("1. AUTOMATIC (Recommended): Set up a cron job to refresh the token every 30 minutes")
-    log("2. MANUAL: Run the token refresh script manually when needed")
-    log("")
-    
-    # Get current directory and Python executable
-    current_dir = os.getcwd()
-    python_executable = sys.executable
-    
-    # Build the cron command dynamically
-    cron_schedule = "*/30 * * * *"  # Every 30 minutes
-    cron_command = f"{cron_schedule} cd {current_dir} && {python_executable} nsp_token_manager.py >> nsp_token_manager.log 2>&1"
-    
-    choice = input("\nWould you like to set up automatic token refresh? [Y/n]: ").strip().lower()
-    
-    if choice != 'n':
-        # Try to set up the cron job
-        try:
-            # Get existing crontab
-            result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
-            if result.returncode == 0:
-                existing_crontab = result.stdout
-            else:
-                existing_crontab = ""
-            
-            # Check if our cron job already exists
-            if 'nsp_token_manager.py' in existing_crontab:
-                log("✅ A cron job for token refresh already exists")
-                log("📋 Existing cron entries for NSP:")
-                for line in existing_crontab.split('\n'):
-                    if 'nsp_token_manager.py' in line:
-                        log(f"   {line}")
-            else:
-                # Add new cron job
-                new_crontab = existing_crontab.rstrip('\n') + '\n' if existing_crontab else ''
-                new_crontab += f"# NSP Token Auto-refresh\n{cron_command}\n"
-                
-                # Install new crontab
-                process = subprocess.Popen(['crontab', '-'], stdin=subprocess.PIPE, text=True)
-                process.communicate(input=new_crontab)
-                
-                if process.returncode == 0:
-                    log("✅ Cron job successfully installed!")
-                    log(f"📋 Added cron job: {cron_command}")
-                    log("")
-                    log("The token will be automatically refreshed every 30 minutes.")
-                    log("You can check the refresh logs in: nsp_token_manager.log")
-                else:
-                    log("❌ Failed to install cron job")
-                    show_manual_setup_instructions(cron_command)
-                    
-        except Exception as e:
-            log(f"❌ Error setting up cron: {e}")
-            show_manual_setup_instructions(cron_command)
-    else:
-        log("")
-        log("⚠️  Manual Token Management Selected")
-        log("" + "="*50)
-        log("You will need to manually refresh the token before it expires.")
-        log("")
-        log("To refresh the token manually, run:")
-        log(f"   cd {current_dir}")
-        log(f"   {python_executable} nsp_token_manager.py")
-        log("")
-        log("The token typically expires after 1-2 hours of inactivity.")
-        log("If the consumer fails with authentication errors, run the above command.")
-
-def show_manual_setup_instructions(cron_command):
-    """Show manual cron setup instructions"""
-    log("")
-    log("📝 To manually set up the cron job, run:")
-    log("   crontab -e")
-    log("")
-    log("Then add this line:")
-    log(f"   {cron_command}")
-    log("")
-    log("Save and exit the editor to activate the cron job.")
 
 def generate_initial_token():
     """Generate initial access token and update the configuration file"""
@@ -1027,9 +945,6 @@ def main():
         else:
             log("⚠️  Could not generate initial token - you may need to run the consumer manually first")
         
-        # Phase 9: Set up automatic token refresh (cron)
-        log("🔍 Phase 9: Automatic Token Refresh Setup")
-        setup_token_refresh_cron()
         
         log("✅ NSP Consumer setup completed successfully!")
         log("🎉 You can now run the NSP Kafka Consumer")

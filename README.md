@@ -71,7 +71,6 @@ This script will:
 - Generate a complete `nsp_config.ini` configuration file
 - Set up the `certs/` directory with all required certificates
 - Generate an initial access token for immediate use
-- Optionally configure automatic token refresh via cron job
 
 **Setup Script Options:**
 - `--debug` or `-d`: Enable verbose output showing all discovered resources
@@ -125,31 +124,26 @@ ssl_keyfile = ./certs/client_key.pem
 
 ### 5. Token Management
 
-NSP uses OAuth2 authentication with access tokens that expire periodically. This project includes automatic token management:
+NSP uses OAuth2 authentication with access tokens that expire periodically. This project includes automatic token management using OAuth2 refresh tokens:
 
-**Automatic Token Refresh (Recommended)**
+**Automatic Token Refresh**
 
-During setup, you'll be prompted to configure automatic token refresh via cron. If you accept, a cron job will be created that runs every 30 minutes:
+The token manager automatically handles token refresh using the OAuth2 refresh token stored in your configuration. When the Kafka consumer or any other component needs a token, it will:
 
-```bash
-*/30 * * * * cd /your/project/directory && /path/to/python nsp_token_manager.py >> nsp_token_manager.log 2>&1
-```
+- Check if the current access token is still valid
+- Automatically use the refresh token to obtain a new access token if needed
+- Update the `nsp_config.ini` file with the new token
+- Log all token operations for auditing
 
-This ensures your consumer always has a valid token without manual intervention.
+**Manual Token Refresh**
 
-**Manual Token Management**
-
-If you prefer manual control, you can refresh tokens on-demand:
+You can also manually trigger a token refresh if needed:
 
 ```bash
 python3 nsp_token_manager.py
 ```
 
-The token manager will:
-- Check if the current token is still valid
-- Automatically refresh it if expired or expiring soon
-- Update the `nsp_config.ini` file with the new token
-- Log all token operations for auditing
+This is typically not necessary as tokens are refreshed automatically when required.
 
 ## Usage
 
